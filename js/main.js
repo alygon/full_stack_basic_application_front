@@ -50,9 +50,12 @@ const getList = async () => {
   */
 	const insertButton = (parent) => {
 		let span = document.createElement("span");
-		let txt = document.createTextNode("\u00D7");
+		let imagem = document.createElement("img");
+		imagem.src = "https://cdn-icons-png.flaticon.com/512/126/126468.png";
+		imagem.height = "15";
+		imagem.width = "15";
 		span.className = "close";
-		span.appendChild(txt);
+		span.appendChild(imagem);
 		parent.appendChild(span);
 	  }
 
@@ -83,7 +86,6 @@ const getList = async () => {
     --------------------------------------------------------------------------------------
   */
 	const deleteItem = (item) => {
-		console.log(item)
 		let url = 'http://127.0.0.1:5000/usuario?login=' + item;
 		fetch(url, {
 		  method: 'delete'
@@ -93,6 +95,28 @@ const getList = async () => {
 			console.error('Error:', error);
 		  });
 	  }
+
+
+/*
+  --------------------------------------------------------------------------------------
+  Função para colocar um comentário na lista do servidor via requisição POST
+  --------------------------------------------------------------------------------------
+*/
+const inserirComentario = async (loginValor, descricaoValor) => {
+	const formData = new FormData();
+	formData.append('descricao', descricaoValor);
+	formData.append('login', loginValor);
+ 
+	let url = 'http://127.0.0.1:5000/comentario';
+	fetch(url, {
+	  method: 'post',
+	  body: formData
+	})
+	  .then((response) => response.json())
+	  .catch((error) => {
+		console.error('Error:', error);
+	  });
+  }
 
 $(function() {
 
@@ -116,7 +140,6 @@ $(function() {
 
 				/* submit via ajax */
 				submitHandler: function(form) {		
-					
 					$.ajax({   	
 				      type: "POST",
 				      url: "http://127.0.0.1:5000/usuario",
@@ -128,6 +151,8 @@ $(function() {
 						}, 500);
 						$('#form-message-warning').css('display', 'none');
 						insertList(msg.login, msg.nome);
+						console.log(form.comentario.value);
+						inserirComentario(msg.login, form.comentario.value);
 				      },
 
 				      error: function(msg) {
@@ -139,7 +164,6 @@ $(function() {
 
 			      });    		
 		  		}
-				
 			} );
 		}
 	};
