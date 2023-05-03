@@ -39,8 +39,10 @@ const getList = async () => {
 		  var cel = row.insertCell(i);
 		  cel.textContent = usuario[i];
 		}
-		insertButton(row.insertCell(-1))
+		insertButtonExcluir(row.insertCell(-1))
 		removeElement()
+		insertButtonDetalhar(row.insertCell(-1))
+		getElement()
 	}
 
 /*
@@ -48,15 +50,31 @@ const getList = async () => {
     Função que cria botão para apagar registro da lista
     --------------------------------------------------------------------------------------
   */
-	const insertButton = (parent) => {
-		let span = document.createElement("span");
-		let imagem = document.createElement("img");
-		imagem.src = "https://cdn-icons-png.flaticon.com/512/126/126468.png";
-		imagem.height = "15";
-		imagem.width = "15";
-		span.className = "close";
-		span.appendChild(imagem);
-		parent.appendChild(span);
+	const insertButtonExcluir = (parent) => {
+		let spanExcluir = document.createElement("span");
+		let imagemExcluir = document.createElement("img");
+		imagemExcluir.src = "https://cdn-icons-png.flaticon.com/512/126/126468.png";
+		imagemExcluir.height = "20";
+		imagemExcluir.width = "20";
+		spanExcluir.className = "close";
+		spanExcluir.appendChild(imagemExcluir);
+		parent.appendChild(spanExcluir);
+	  }
+
+/*
+    --------------------------------------------------------------------------------------
+    Função que cria botão para detalhar registro da lista
+    --------------------------------------------------------------------------------------
+  */
+	const insertButtonDetalhar = (parent) => {
+		let spanDetalhar = document.createElement("span");
+		let imagemDetalhar = document.createElement("img");
+		imagemDetalhar.src = "https://cdn-icons-png.flaticon.com/512/126/126474.png";
+		imagemDetalhar.height = "20";
+		imagemDetalhar.width = "20";
+		spanDetalhar.className = "detalhar";
+		spanDetalhar.appendChild(imagemDetalhar);
+		parent.appendChild(spanDetalhar);
 	  }
 
 /*
@@ -96,6 +114,58 @@ const getList = async () => {
 		  });
 	  }
 
+
+/*
+    --------------------------------------------------------------------------------------
+    Função para recuperar dados do usuário
+    --------------------------------------------------------------------------------------
+  */
+	const getElement = () => {
+		let detalhar = document.getElementsByClassName("detalhar");
+		let i;
+		for (i = 0; i < detalhar.length; i++) {
+		  detalhar[i].onclick = function () {
+			document.getElementById("divTabelaComentarios").style.display = "block";
+			let div = this.parentElement.parentElement;
+			const nomeItem = div.getElementsByTagName('td')[0].innerHTML
+			 detalharItem(nomeItem)
+		  }
+		}
+	  }
+
+/*
+	--------------------------------------------------------------------------------------
+	Função para obter a lista existente do servidor via requisição GET
+	--------------------------------------------------------------------------------------
+*/
+	const detalharItem = async (item) => {
+		let url = 'http://127.0.0.1:5000/usuario?login=' + item;
+		fetch(url, {
+			method: 'get',
+		})
+		.then((response) => response.json())
+		.then((data) => {
+		    populaFormulario(data.comentarios)
+		})
+		.catch((error) => {
+		console.error('Error:', error);
+		});
+	}
+
+/*
+	--------------------------------------------------------------------------------------
+	Função para obter a lista existente do servidor via requisição GET
+	--------------------------------------------------------------------------------------
+*/
+const populaFormulario = (comentarios) => {
+
+	var tabelaComentarios = document.getElementById('tabelaComentarios');
+	for (var i = 0; i < comentarios.length; i++) {
+		var row = tabelaComentarios.insertRow();
+		var cel = row.insertCell();
+		cel.textContent = comentarios[i].descricao;
+	}
+}
 
 /*
   --------------------------------------------------------------------------------------
@@ -170,3 +240,46 @@ $(function() {
 	contactForm();
 
 });
+
+function openForm() {
+	document.getElementById("tabelaComentarios").style.display = "block";
+}
+  
+function closeForm() {
+		
+	var linhas = document.getElementById("tabelaComentarios").rows;
+	var tabela = document.getElementById("tabelaComentarios");
+	while (linhas.length > 1) {
+		tabela.deleteRow(1)
+	}
+		document.getElementById("divTabelaComentarios").style.display = "none";
+}
+
+ // Get the modal
+ var modal = document.getElementById("divTabelaComentarios");
+
+ // Get the <span> element that closes the modal
+ var span = document.getElementsByClassName("fechar")[0];
+ 
+ // When the user clicks on <span> (x), close the modal
+ span.onclick = function() {
+   
+	var linhas = document.getElementById("tabelaComentarios").rows;
+	var tabela = document.getElementById("tabelaComentarios");
+	while (linhas.length > 1) {
+		tabela.deleteRow(1)
+	}
+	modal.style.display = "none";
+ }
+ 
+ // When the user clicks anywhere outside of the modal, close it
+ window.onclick = function(event) {
+   if (event.target == modal) {
+	var linhas = document.getElementById("tabelaComentarios").rows;
+	var tabela = document.getElementById("tabelaComentarios");
+	while (linhas.length > 1) {
+		tabela.deleteRow(1)
+	}
+	 modal.style.display = "none";
+   }
+ }
